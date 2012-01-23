@@ -103,7 +103,13 @@ function LoadTimeline() {
 				}
 				$jsonText = $jsonText."\"".$key."\":".$value.",";
 			}
+			if (count($event->attributes())) {
+				$jsonText = substr($jsonText, 0, -1);
+			}
 			$jsonText = $jsonText."},\n";
+		}
+		if (count($eventsource->data->event)) {
+			$jsonText = substr($jsonText, 0, -2);
 		}
 		$jsonText = $jsonText."]\n}";
 		$out = $out."\teventSource".$i.".loadJSON(".$jsonText.", document.location.href);\n\n";
@@ -119,8 +125,14 @@ function LoadTimeline() {
 		foreach ($eventsource->attributes() as $key => $value) {
 			$out = $out.$key.":".$value.",";
 		}
+		if (count($eventsource->attributes())) {
+			$out = substr($out, 0, -1);
+		}
 		$out = $out."}),\n";
 		$i = $i + 1;
+	}
+	if (count($xml->eventsource)) {
+		$out = substr($out, 0, -2);
 	}
 	$out = $out."\t];\n\n";
 
