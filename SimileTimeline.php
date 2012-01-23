@@ -43,7 +43,7 @@ if( !defined( 'MEDIAWIKI' ) ) {
 $wgExtensionCredits['parserhook']['SimileTimeline'] = array(
 	'path'		=> __FILE__,
 	'name'		=> 'SimileTimeline',
-	'description'	=> 'uses ',
+	'description'	=> 'Renders a timeline using SIMILE Timeline library',
 	'version'	=> '1.0',
 	'author'	=> 'Seong Jae Lee'
 );
@@ -132,7 +132,7 @@ function LoadTimeline() {
 	}
 	$out = $out."\n";
 
-	$out = $out."\ttimeline = Timeline.create(document.getElementById('timeline".$wgSimileTimelineCounter."'), bandInfos, Timeline.HOERIZONTAL);\n";
+	$out = $out."\ttimeline = Timeline.create(document.getElementById('timeline".$wgSimileTimelineCounter."'), bandInfos, Timeline.HORIZONTAL);\n";
 	$out = $out."}\n";
 	$out = $out."function ResizeTimeline(){if(resizeTimerID==null){resizeTimerID=window.setTimeout(function(){resizeTimer=null;timeline.layout();},500);}}\n";
 	$out = $out."$(document).ready(LoadTimeline);\n";
