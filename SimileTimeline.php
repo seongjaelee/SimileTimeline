@@ -62,10 +62,12 @@ function wfSimileTimelineRender($input, array $args, Parser $parser, PPFrame $fr
 
 	global $wgSimileTimelineCounter;
 	$wgSimileTimelineCounter = $wgSimileTimelineCounter + 1;
+	$tli = $wgSimileTimelineCounter; // short for TimeLine Index
+
+	global $wgScriptPath;
+	$directory = $wgScriptPath.'/extensions/SimileTimeline/';
 
 	if ($wgSimileTimelineCounter == 1) {
-                global $wgScriptPath;
-		$directory = $wgScriptPath.'/extensions/SimileTimeline/';
 		$parser->getOutput()->addHeadItem("<script type='text/javascript' src='".$directory."timeline_2.3.0/timeline_js/timeline-api.js?bundle=true'></script>\n");
 		$parser->getOutput()->addHeadItem("<style type='text/css'>.timeline{line-height:12px;font-size:11px;letter-spacing:-0.05em;color:black;}.timeline-event-icon{line-height:0;}</style>\n");
 		$parser->getOutput()->addHeadItem("<script type='text/javascript' src='".$directory."colorbox_1.3.19/jquery.colorbox-min.js'></script>\n");
@@ -76,7 +78,7 @@ function wfSimileTimelineRender($input, array $args, Parser $parser, PPFrame $fr
 	$xml = new SimpleXMLElement('<timeline>'.$input.'</timeline>');
 
 	$out = "<script type='text/javascript'>
-var timeline;
+var timeline".$tli.";
 function LoadTimeline() {
 	
 	// If we don't add this, it gives us the following error:
@@ -87,8 +89,8 @@ function LoadTimeline() {
 	theme.event.instant.icon = '".$directory."images/circle.png';
 	theme.event.instant.iconWidth = 5;
 	theme.event.instant.iconHeight = 6;
-	theme.event.tape.height = 6;
-	
+	theme.event.tape.height = 6;	
+
 ";
 
 	// event source
@@ -126,12 +128,14 @@ function LoadTimeline() {
 	$i = 0;
 	foreach ($xml->eventsource as $eventsource) {
 		$out = $out."\t\tTimeline.createBandInfo({eventSource:eventSource".$i.",theme:theme,";
+		if (isset($args["date"]) && $args["date"]) {
+			$out = $out."date:Timeline.DateTime.parseGregorianDateTime(\"".$args["date"]."\"),";
+		}
 		foreach ($eventsource->attributes() as $key => $value) {
+			if ($key == 'highlight') continue;
 			$out = $out.$key.":".$value.",";
 		}
-		if (count($eventsource->attributes())) {
-			$out = substr($out, 0, -1);
-		}
+		$out = substr($out, 0, -1);
 		$out = $out."}),\n";
 		$i = $i + 1;
 	}
@@ -142,19 +146,28 @@ function LoadTimeline() {
 
 	$i = 0;
 	foreach ($xml->eventsource as $eventsource) {
-		if ($i != 0)
+		if ($i != 0) {
 			$out = $out."\tbandInfos[".$i."].syncWith = 0;\n";
+		}
+		foreach ($eventsource->attributes() as $key => $value) {
+			if ($key != 'highlight') continue;
+			$out = $out."\tbandInfos[".$i."].highlight = ".$value.";\n";
+		}
 		$i = $i + 1;
 	}
 	$out = $out."\n";
-
-	$out = $out."\ttimeline = Timeline.create(document.getElementById('timeline".$wgSimileTimelineCounter."'), bandInfos, Timeline.HORIZONTAL);\n";
+	$out = $out."\ttimeline".$tli." = Timeline.create(document.getElementById('timeline".$wgSimileTimelineCounter."'), bandInfos, Timeline.HORIZONTAL);\n";
 	$out = $out."}\n";
-	$out = $out."function ResizeTimeline(){if(resizeTimerID==null){resizeTimerID=window.setTimeout(function(){resizeTimer=null;timeline.layout();},500);}}\n";
+
+	$out = $out."var resizeTimerID".$wgSimileTimelineCounter." = null;\n";
+	$out = $out."function ResizeTimeline(){if(resizeTimerID".$wgSimileTimelineCounter."==null){resizeTimerID".$wgSimileTimelineCounter."=window.setTimeout(function(){resizeTimerID".$wgSimileTimelineCounter."=null;timeline".$tli.".layout();},500);}}\n";
 	$out = $out."$(document).ready(LoadTimeline);\n";
-	$out = $out."$(document).resize(ResizeTimeline);\n";
-	$out = $out."$(document).bind('cbox_complete', function(){ timeline.layout(); });\n";
-	$out = $out."$(document).bind('cbox_closed', function(){ timeline.layout(); });\n";
+	$out = $out."$(document).resize(ResizeTimeline);\n\n";
+	$out = $out."var centerDate".$tli." = null;\n";
+	$out = $out."$(document).bind('cbox_load', function() { centerDate".$tli." = timeline".$tli.".getBand(0).getCenterVisibleDate(); });\n";
+	$out = $out."$(document).bind('cbox_complete', function() { timeline".$tli.".layout(); timeline".$tli.".getBand(0).setCenterVisibleDate(centerDate".$tli."); });\n";
+	$out = $out."$(document).bind('cbox_cleanup', function() { centerDate".$tli." = timeline".$tli.".getBand(0).getCenterVisibleDate(); });\n";
+	$out = $out."$(document).bind('cbox_closed', function(){ timeline".$tli.".layout(); timeline".$tli.".getBand(0).setCenterVisibleDate(centerDate".$tli."); });\n";
 	$out = $out."</script>\n";
 
 	$parser->getOutput()->addHeadItem($out);

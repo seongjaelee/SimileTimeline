@@ -116,8 +116,9 @@
 .timeline-ether-bg{width:100%; height:100%;}
 .timeline-band-0 .timeline-ether-bg{background-color:#eee}
 .timeline-band-1 .timeline-ether-bg{background-color:#ddd}
-.timeline-band-2 .timeline-ether-bg{background-color:#ccc}
-.timeline-band-3 .timeline-ether-bg{background-color:#aaa}
+.timeline-band-2 .timeline-ether-bg{background-color:#eee}
+.timeline-band-3 .timeline-ether-bg{background-color:#ddd}
+.timeline-band-4 .timeline-ether-bg{background-color:#eee};
 .timeline-duration-event {
     position: absolute;
     overflow: hidden;
