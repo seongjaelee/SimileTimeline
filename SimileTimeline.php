@@ -153,6 +153,8 @@ function LoadTimeline() {
 	$out = $out."function ResizeTimeline(){if(resizeTimerID==null){resizeTimerID=window.setTimeout(function(){resizeTimer=null;timeline.layout();},500);}}\n";
 	$out = $out."$(document).ready(LoadTimeline);\n";
 	$out = $out."$(document).resize(ResizeTimeline);\n";
+	$out = $out."$(document).bind('cbox_complete', function(){ timeline.layout(); });\n";
+	$out = $out."$(document).bind('cbox_closed', function(){ timeline.layout(); });\n";
 	$out = $out."</script>\n";
 
 	$parser->getOutput()->addHeadItem($out);
