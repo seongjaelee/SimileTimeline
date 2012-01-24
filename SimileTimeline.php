@@ -68,7 +68,7 @@ function wfSimileTimelineRender($input, array $args, Parser $parser, PPFrame $fr
 		$directory = $wgScriptPath.'/extensions/SimileTimeline/';
 		$parser->getOutput()->addHeadItem("<script type='text/javascript' src='".$directory."timeline_2.3.0/timeline_js/timeline-api.js?bundle=true'></script>\n");
 		$parser->getOutput()->addHeadItem("<style type='text/css'>.timeline{line-height:12px;font-size:11px;letter-spacing:-0.05em;color:black;}.timeline-event-icon{line-height:0;}</style>\n");
-		$parser->getOutput()->addHeadItem("<script type='text/javascript' src='".$directory."colorbox_1.3.19/jquery.colorbox.js'></script>\n");
+		$parser->getOutput()->addHeadItem("<script type='text/javascript' src='".$directory."colorbox_1.3.19/jquery.colorbox-min.js'></script>\n");
 		$parser->getOutput()->addHeadItem("<link rel='stylesheet' href='".$directory."colorbox_1.3.19/colorbox.css' media='screen' />\n");
 		$parser->getOutput()->addHeadItem("<script type='text/javascript'>$(document).ready(function(){ $(\".timeline_colorbox_button\").colorbox({inline:true, width:\"100%\"}); });</script>");
 	}
@@ -162,8 +162,16 @@ function LoadTimeline() {
 	if (isset($args['height']) && $args['height']) {
 		$height = $args['height'];
 	}
-	return "<div id='timeline".$wgSimileTimelineCounter."' class='timeline' style='height:".$height."'></div>
-<a class='timeline_colorbox_button' href='#timeline".$wgSimileTimelineCounter."'>Make Fullscreen</a>\n";
+	return "
+<div class='thumbinner'>
+<div class='thumbimage'>
+<div id='timeline".$wgSimileTimelineCounter."' class='timeline' style='height:".$height."'></div>
+</div>
+<div class='thumbcaption'>
+<div class='magnify'><a class='timeline_colorbox_button' href='#timeline".$wgSimileTimelineCounter."'><img src='".$directory."images/magnify-clip.png' width='15' height='11' /></a></div>
+</div>
+</div>
+\n";
 }
 
 ?>
